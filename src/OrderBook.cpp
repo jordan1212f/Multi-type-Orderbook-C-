@@ -36,4 +36,3 @@ void Orderbook::RemoveGoodForDayOrders()
 
 }
 
-
