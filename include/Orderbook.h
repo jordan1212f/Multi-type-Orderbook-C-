@@ -34,4 +34,44 @@ private:
             Match,
         };
     };
+
+    std::unordered_map<Price, LevelData> data_;
+    std::map<Price, OrderPointers, std::greater<Price>> bids_;
+    std::map<Price, OrderPointers, std::less<Price>> asks_;
+    std::unordered_map<OrderId, OrderEntry> orders_;
+    mutable std::mutex ordersMutex_;
+    std::thread ordersRemoveThread_;
+    std::condition_variable shutdownConditionVariable_;
+    std::atomic<bool> shutdown_{ false };
+
+    void RemoveGoodForDayOrders();
+
+    void CancelOrders(OrderIds orderIds);
+    void CancelOrderIternal(OrderId orderId);
+
+    void OnOrderCancelled(OrderPointer order);
+    void OnOrderAdded(OrderPointer order);
+    void OnOrderMatched(Price price, Quantity quantity, bool IsFullyFilled);
+    void UpdateLevelData(Price price, Quantity quantity, LevelData::Action action);
+
+    bool CanFullyFill(Side side, Price price, Quantity quantity) const;
+    bool CanMatch(Side side, Price price) const;
+    Trades MatchOrders();
+
+
+public:
+
+    Orderbook();
+    Orderbook(const Orderbook&) = delete;
+    void operator=(const Orderbook&) = delete;
+    Orderbook(Orderbook&&) = delete;
+    void operator=(Orderbook&&) = delete;
+    ~Orderbook();
+
+    Trades Addorder(OrderPointer order);
+    void CancelOrder(OrderId orderId);
+    Trades ModifyOrder(OrderModify order);
+
+    std::size_t Size() const;
+    OrderBookLevelInfos GetOrderInfos() const;
 };
