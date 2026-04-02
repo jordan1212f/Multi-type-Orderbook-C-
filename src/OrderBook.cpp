@@ -398,4 +398,4 @@ OrderBookLevelInfos Orderbook::GetOrderInfos() const
         askInfos.push_back(CreateLevelInfos(price, orders));
 
     return OrderBookLevelInfos{ bidInfos, askInfos };
-}
+};
